@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32f4xx_hal_adc_ex.h"
+#include "oled.h"
 
 /* USER CODE END Includes */
 
@@ -43,6 +44,8 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
+I2C_HandleTypeDef hi2c1;
+
 /* USER CODE BEGIN PV */
 uint32_t adc_value=0;
 float battery_voltage=0.0f;
@@ -53,6 +56,7 @@ float battery_voltage=0.0f;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -92,8 +96,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-
+	for (int i = 0; i < 6; i++) {
+    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+    HAL_Delay(200);
+}
+OLED_Init();
+for (int i = 0; i < 4; i++) {
+    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+    HAL_Delay(800);
+}
 
   /* USER CODE END 2 */
 
@@ -104,13 +117,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		HAL_ADC_Start(&hadc1);                              
-if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) { 
-    adc_value = HAL_ADC_GetValue(&hadc1); 
-    battery_voltage = (adc_value * 3.3f / 4096.0f) * 4.642966934f;
+		             HAL_ADC_Start(&hadc1);                                // ??ADC1
+if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) { // ??????,??10ms
+    adc_value = HAL_ADC_GetValue(&hadc1);             // ????ADC?(0-4095)
+    battery_voltage = (adc_value * 3.3f / 4096.0f) * 4.687f; // ???????
 }
-HAL_ADC_Stop(&hadc1);                              
-HAL_Delay(500); 
+HAL_ADC_Stop(&hadc1);                                 // ??ADC1
+
+// —— 2. ?OLED????? ——
+OLED_Clear();                          // ??,????
+OLED_ShowString(0, "Voltage:");        // ?0???"Voltage:"??
+OLED_ShowFloat(2, battery_voltage, 2); // ?2??????,??????
+HAL_Delay(500);                        // ?500ms????
+
   }
   /* USER CODE END 3 */
 }
@@ -209,18 +228,65 @@ static void MX_ADC1_Init(void)
 }
 
 /**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 400000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PD12 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
