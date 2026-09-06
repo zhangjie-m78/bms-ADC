@@ -1,0 +1,25 @@
+--cpu=Cortex-M4.fp.sp
+"bms-adc\startup_stm32f407xx.o"
+"bms-adc\main.o"
+"bms-adc\stm32f4xx_it.o"
+"bms-adc\stm32f4xx_hal_msp.o"
+"bms-adc\stm32f4xx_hal_adc.o"
+"bms-adc\stm32f4xx_hal_adc_ex.o"
+"bms-adc\stm32f4xx_hal_rcc.o"
+"bms-adc\stm32f4xx_hal_rcc_ex.o"
+"bms-adc\stm32f4xx_hal_flash.o"
+"bms-adc\stm32f4xx_hal_flash_ex.o"
+"bms-adc\stm32f4xx_hal_flash_ramfunc.o"
+"bms-adc\stm32f4xx_hal_gpio.o"
+"bms-adc\stm32f4xx_hal_dma_ex.o"
+"bms-adc\stm32f4xx_hal_dma.o"
+"bms-adc\stm32f4xx_hal_pwr.o"
+"bms-adc\stm32f4xx_hal_pwr_ex.o"
+"bms-adc\stm32f4xx_hal_cortex.o"
+"bms-adc\stm32f4xx_hal.o"
+"bms-adc\stm32f4xx_hal_exti.o"
+"bms-adc\system_stm32f4xx.o"
+--strict --scatter "BMS-ADC\BMS-ADC.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "BMS-ADC.map" -o BMS-ADC\BMS-ADC.axf
