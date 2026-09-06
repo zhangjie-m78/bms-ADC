@@ -1,6 +1,7 @@
 --cpu=Cortex-M4.fp.sp
 "bms-adc\startup_stm32f407xx.o"
 "bms-adc\oled.o"
+"bms-adc\ds18b20.o"
 "bms-adc\main.o"
 "bms-adc\stm32f4xx_it.o"
 "bms-adc\stm32f4xx_hal_msp.o"

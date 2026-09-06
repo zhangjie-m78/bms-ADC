@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "stm32f4xx_hal_adc_ex.h"
 #include "oled.h"
+#include "ds18b20.h"
 
 /* USER CODE END Includes */
 
@@ -49,6 +50,7 @@ I2C_HandleTypeDef hi2c1;
 /* USER CODE BEGIN PV */
 uint32_t adc_value=0;
 float battery_voltage=0.0f;
+float battery_temperature = 0.0f;
 
 /* USER CODE END PV */
 
@@ -64,6 +66,7 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 #include<stdio.h>
+
 /* USER CODE END 0 */
 
 /**
@@ -89,6 +92,7 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -103,6 +107,7 @@ int main(void)
     HAL_Delay(200);
 }
 OLED_Init();
+DS18B20_Init();
 for (int i = 0; i < 4; i++) {
     HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
     HAL_Delay(800);
@@ -117,19 +122,25 @@ for (int i = 0; i < 4; i++) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		             HAL_ADC_Start(&hadc1);                                // ??ADC1
-if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) { // ??????,??10ms
-    adc_value = HAL_ADC_GetValue(&hadc1);             // ????ADC?(0-4095)
-    battery_voltage = (adc_value * 3.3f / 4096.0f) * 4.687f; // ???????
+		             // 采集电池电压
+HAL_ADC_Start(&hadc1);
+if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
+    adc_value = HAL_ADC_GetValue(&hadc1);
+    battery_voltage = (adc_value * 3.3f / 4096.0f) * 4.687f;
 }
-HAL_ADC_Stop(&hadc1);                                 // ??ADC1
+HAL_ADC_Stop(&hadc1);
 
-// �� 2. ?OLED????? ��
-OLED_Clear();                          // ??,????
-OLED_ShowString(0, "Voltage:");        // ?0???"Voltage:"??
-OLED_ShowFloat(2, battery_voltage, 2); // ?2??????,??????
-HAL_Delay(500);                        // ?500ms????
+// 读取温度
+battery_temperature = DS18B20_ReadTemp();
 
+// 显示
+OLED_Clear();
+OLED_ShowString(0, "Voltage:");
+OLED_ShowFloat(2, battery_voltage, 2);
+OLED_ShowString(4, "Temp:");
+OLED_ShowFloat(6, battery_temperature, 1);
+
+HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }

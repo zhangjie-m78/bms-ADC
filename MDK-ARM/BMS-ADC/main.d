@@ -31,4 +31,5 @@ bms-adc/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_i2c_ex.h \
   ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr.h \
   ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h \
-  ..\MDK-ARM\oled.h D:\keil\ MDK\ARM\ARMCLANG\include\stdio.h
+  ..\MDK-ARM\oled.h ..\MDK-ARM\ds18b20.h \
+  D:\keil\ MDK\ARM\ARMCLANG\include\stdio.h
